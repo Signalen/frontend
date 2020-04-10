@@ -1,0 +1,41 @@
+name: Test
+on: push
+
+jobs:
+  test:
+    name: Unit tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Cache node modules
+        uses: actions/cache@v1
+        env:
+          cache-name: cache-node-modules
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+
+      - name: Set timezone to Europe/Amsterdam
+        run: sudo timedatectl set-timezone Europe/Amsterdam
+
+      - name: Install libgif-dev
+        run: sudo apt install libgif-dev
+
+      - name: Setup Node 11.15
+        uses: actions/setup-node@v1
+        with:
+          node-version: 11.15
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm test
+        env:
+          CI: true
