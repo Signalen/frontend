@@ -1,0 +1,40 @@
+version: '3.5'
+services:
+  frontend:
+    build:
+      context: .
+    environment:
+      - TZ=Europe/Amsterdam
+    volumes:
+      - ./environment.conf.e2e.json:/environment.conf.json
+    ports:
+      - "3001:80"
+
+  backend:
+    image: signalen/backend:latest
+    environment:
+      - ALLOWED_HOSTS=localhost
+      - SECRET_KEY=somethingsecret
+      - DB_NAME=signals
+      - DB_PASSWORD=insecure
+    command:
+      - /usr/local/bin/uwsgi
+      - --master
+      - --http=:8000
+      - --module=signals.wsgi:application
+      - --processes=4
+      - --threads=2
+      - --static-map=/signals/static=/static
+      - --static-map=/signals/media=/media
+      - --die-on-term
+    ports:
+      - "8000:8000"
+
+  database:
+    image: amsterdam/postgres11
+    environment:
+      POSTGRES_DB: signals
+      POSTGRES_USER: signals
+      POSTGRES_PASSWORD: insecure
+    ports:
+      - "5409:5432"
