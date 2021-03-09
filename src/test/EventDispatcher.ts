@@ -6,7 +6,7 @@ interface IEventDispatcher {
 
 type Handlers = (() => void)[];
 
-class EventDispathcher implements IEventDispatcher {
+class EventDispatcher implements IEventDispatcher {
   public events: Record<string, Handlers>;
 
   public constructor() {
@@ -32,4 +32,4 @@ class EventDispathcher implements IEventDispatcher {
   };
 }
 
-export default EventDispathcher;
+export default EventDispatcher;
